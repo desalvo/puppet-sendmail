@@ -123,7 +123,7 @@ dnl # The following causes sendmail to only listen on the IPv4 loopback address
 dnl # 127.0.0.1 and not on any other network devices. Remove the loopback
 dnl # address restriction to accept email from the internet or intranet.
 dnl #
-DAEMON_OPTIONS(`Port=smtp,Addr=127.0.0.1, Name=MTA')dnl
+DAEMON_OPTIONS(`Port=smtp,Addr=<%= scope.lookupvar('sendmail::listen_ip') %>, Name=MTA')dnl
 dnl #
 dnl # The following causes sendmail to additionally listen to port 587 for
 dnl # mail from MUAs that authenticate. Roaming users who can't reach their
@@ -197,6 +197,17 @@ MASQUERADE_DOMAIN(<%= scope.lookupvar('sendmail::masquerade_domain') %>)dnl
 <% else -%>
 dnl MASQUERADE_DOMAIN(mydomain.lan)dnl
 <% end -%>
-MAILER(smtp)dnl
-MAILER(procmail)dnl
-dnl MAILER(cyrusv2)dnl
+<% scope.lookupvar('sendmail::mailers').each do |mailer| -%>
+MAILER(<%= mailer %>)dnl
+<% end -%>
+<% if scope.lookupvar('sendmail::mailer_definitions') != {} -%>
+MAILER_DEFINITIONS
+####################################
+###   New Mailer specifications  ###
+####################################
+
+<% scope.lookupvar('sendmail::mailer_definitions').each do |mailer,params| -%>
+M<%= mailer %>,	<%= params %>
+
+<% end -%>
+<% end -%>
