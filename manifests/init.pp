@@ -43,6 +43,36 @@
 # [*generics_table*]
 #   Hash of user email addresses for multiple domains. Example: { 'user', 'email' }
 #
+# [*listen_ip*]
+#   Specifies if sendmail should listen on an ip other than localhost. Example: 127.0.0.1
+#
+# [*is_relay*]
+#   Specifies if sendmail should relay email from other servers. Boolean
+#
+# [*relay_domains*]
+#   List of domains to relay email for. Example: ['example.com','example2.co.uk']
+#
+# [*enable_smtps*]
+#   Specifies if sendmail should listen on SMTPS port. Boolean
+#
+# [*ssl_cacert_path*]
+#   Path for the CA certificate directory, default is undef
+#
+# [*ssl_cacert*]
+#   Full file path for the CA certificate, default is undef
+#
+# [*ssl_server_cert*]
+#   Full file path for the server certificate, default is undef
+#
+# [*ssl_server_key*]
+#   Full file path for the server private key, default is undef
+#
+# [*ssl_client_cert*]
+#   Full file path for the client certificate, default is undef
+#
+# [*ssl_client_key*]
+#   Full file path for the client private key, default is undef
+#
 # === Examples
 #
 #  class { sendmail:
@@ -69,6 +99,16 @@ class sendmail (
   $aliases                  = undef,
   $generics_domains         = undef,
   $generics_table           = undef,
+  $listen_ip                = '127.0.0.1',
+  $is_relay                 = undef,
+  $relay_domains            = $sendmail::params::relay_domains,
+  $enable_smtps             = false,
+  $ssl_cacert_path          = '',
+  $ssl_cacert               = '',
+  $ssl_server_cert          = '',
+  $ssl_server_key           = '',
+  $ssl_client_cert          = '',
+  $ssl_client_key           = ''
 ) inherits sendmail::params {
     package { $sendmail::params::sendmail_pkgs: ensure => latest }
 
@@ -78,7 +118,7 @@ class sendmail (
         mode    => '0644',
         content => template($sendmail::params::sendmail_mc_tmpl),
         require => Package[$sendmail::params::sendmail_pkgs],
-        notify  => Exec ["make_sendmail_config"],
+        notify  => Exec["make_sendmail_config"],
     }
 
     if ($aliases) {
@@ -93,7 +133,20 @@ class sendmail (
     } else {
         file { $sendmail::params::aliases_path: ensure => absent, notify => Service[$sendmail::service_name] }
     }
-
+    
+    if ($is_relay) {
+        file { $sendmail::params::relay_domains_path:
+            owner   => 'root',
+            group   => 'root',
+            mode    => '0644',
+            content => template($sendmail::params::relay_domains_tmpl),
+            require => Package[$sendmail::params::sendmail_pkgs],
+            notify  => Service[$sendmail::service_name],
+        }
+    } else {
+        file { $sendmail::params::relay_domains_path: ensure => absent, notify => Service[$sendmail::service_name] }
+    }
+    
     if ($generics_domains) {
         file { $sendmail::params::generics_domains_path:
             owner   => 'root',
