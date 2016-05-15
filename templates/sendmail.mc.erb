@@ -57,7 +57,7 @@ dnl # use LOGIN. Other mechanisms should be used if the connection is not
 dnl # guaranteed secure.
 dnl # Please remember that saslauthd needs to be running for AUTH. 
 dnl #
-<% if scope.lookupvar('sendmail::auth_user') and scope.lookupvar('sendmail::auth_password') -%>
+<% if scope.lookupvar('sendmail::auth_password') -%>
 TRUST_AUTH_MECH(`EXTERNAL DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
 define(`confAUTH_MECHANISMS', `EXTERNAL GSSAPI DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
 <% else -%>
@@ -96,7 +96,7 @@ FEATURE(redirect)dnl
 FEATURE(always_add_domain)dnl
 FEATURE(use_cw_file)dnl
 FEATURE(use_ct_file)dnl
-<% if scope.lookupvar('sendmail::auth_user') and scope.lookupvar('sendmail::auth_password') -%>
+<% if scope.lookupvar('sendmail::auth_password') -%>
 FEATURE(`authinfo')dnl
 <% end -%>
 dnl #
