@@ -150,7 +150,7 @@ class sendmail (
             path        => [ "/bin", "/usr/sbin" ],
             cwd         => '/etc/mail',
             refreshonly => true,
-            notify      => Service[$sendmail::service_name],
+            notify      => Exec['make_sendmail_config'],
         }
     } else {
         file { $sendmail::params::authinfo_path: ensure => absent, notify => Exec['make_sendmail_config'] }
