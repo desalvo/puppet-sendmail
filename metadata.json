@@ -1,0 +1,14 @@
+{
+  "name": "desalvo-sendmail",
+  "version": "0.1.3",
+  "author": "desalvo",
+  "summary": "Puppet module for sendmail",
+  "license": "Apache License, Version 2.0",
+  "source": "https://github.com/desalvo/puppet-sendmail",
+  "description": "Puppet module for sendmail configuration",
+  "issues_url": "https://github.com/desalvo/puppet-sendmail/issues",
+  "project_page": "https://github.com/desalvo/puppet-sendmail",
+  "dependencies": [
+  
+  ]
+}

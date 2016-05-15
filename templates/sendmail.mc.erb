@@ -28,6 +28,10 @@ define(`SMART_HOST', `<%= scope.lookupvar('sendmail::smart_host') %>')dnl
 <% else -%>
 dnl define(`SMART_HOST', `smtp.your.provider')dnl
 <% end -%>
+<% if scope.lookupvar('sendmail::port') -%>
+define(`RELAY_MAILER_ARGS', `TCP $h <%= scope.lookupvar('sendmail::port') %>')dnl
+define(`ESMTP_MAILER_ARGS', `TCP $h <%= scope.lookupvar('sendmail::port') %>')dnl
+<% end -%>
 dnl #
 define(`confDEF_USER_ID', ``8:12'')dnl
 dnl define(`confAUTO_REBUILD')dnl
@@ -53,8 +57,13 @@ dnl # use LOGIN. Other mechanisms should be used if the connection is not
 dnl # guaranteed secure.
 dnl # Please remember that saslauthd needs to be running for AUTH. 
 dnl #
+<% if scope.lookupvar('sendmail::authinfo') -%>
+TRUST_AUTH_MECH(`EXTERNAL DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+define(`confAUTH_MECHANISMS', `EXTERNAL GSSAPI DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+<% else -%>
 dnl TRUST_AUTH_MECH(`EXTERNAL DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
 dnl define(`confAUTH_MECHANISMS', `EXTERNAL GSSAPI DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+<% end -%>
 dnl #
 dnl # Rudimentary information on creating certificates for sendmail TLS:
 dnl #     cd /etc/pki/tls/certs; make sendmail.pem
@@ -87,6 +96,9 @@ FEATURE(redirect)dnl
 FEATURE(always_add_domain)dnl
 FEATURE(use_cw_file)dnl
 FEATURE(use_ct_file)dnl
+<% if scope.lookupvar('sendmail::authinfo') -%>
+FEATURE(`authinfo')dnl
+<% end -%>
 dnl #
 dnl # The following limits the number of processes sendmail can fork to accept 
 dnl # incoming messages or process its message queues to 20.) sendmail refuses 

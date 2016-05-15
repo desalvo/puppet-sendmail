@@ -8,5 +8,7 @@ class sendmail::params {
   $generics_domains_tmpl = 'sendmail/generics-domains.erb'
   $generics_table_path   = '/etc/mail/genericstable'
   $generics_table_tmpl   = 'sendmail/genericstable.erb'
+  $authinfo_path         = '/etc/mail/authinfo'
+  $authinfo_tmpl         = 'sendmail/authinfo.erb'
   $service_name          = 'sendmail'
 }

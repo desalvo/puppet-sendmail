@@ -16,6 +16,7 @@ Parameters
 
 * **sendmail_mc_template**: path to the sendmail.mc template
 * **smart_host**: the smtp outgoing server
+* **smtp_port**: the smtp port
 * **exposed_user**: the username to be displayed instead of the masquerade name
 * **masquerade_as**: this causes mail being sent to be labeled as coming from the indicated host.domain
 * **masquerade_envelope**: if masquerading is enabled or the genericstable is in use, set this parameter to true to also masquerade envelopes, normally only the header addresses are masqueraded
@@ -25,7 +26,9 @@ Parameters
 * **aliases**: hash of aliases. Example: { 'user' => 'email' }
 * **generics_domains**: list of domains to serve. Example: [ 'domain1.com', 'domain2.com' }
 * **generics_table**: hash of user email addresses for multiple domains. Example: { 'user', 'email' }
-
+* **auth_user**: SMTP user, not used for authentication
+* **auth_email**: SMTP email (username)
+* **auth_password**: SMTP password
 
 Usage
 -----
@@ -47,6 +50,10 @@ Contributors
 
 Release Notes
 -------------
+
+**0.1.3**
+
+* Support for authorization
 
 **0.1.2**
 

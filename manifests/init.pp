@@ -10,6 +10,9 @@
 # [*smart_host*]
 #  The smtp outgoing server
 #
+# [*smtp_port*]
+#  The smtp port
+#
 # [*exposed_user*]
 #  The username to be displayed instead of the masquerade name
 #
@@ -43,6 +46,15 @@
 # [*generics_table*]
 #   Hash of user email addresses for multiple domains. Example: { 'user', 'email' }
 #
+# [*auth_user*]
+#   SMTP user, not used for authentication
+#
+# [*auth_email*]
+#   SMTP email (username)
+#
+# [*auth_password*]
+#   SMTP password
+#
 # === Examples
 #
 #  class { sendmail:
@@ -60,6 +72,7 @@
 class sendmail (
   $sendmail_mc_template     = $sendmail::params::sendmail_mc_tmpl,
   $smart_host               = undef,
+  $smtp_port                = undef,
   $exposed_user             = 'root',
   $masquerade_as            = false,
   $masquerade_envelope      = false,
@@ -69,6 +82,9 @@ class sendmail (
   $aliases                  = undef,
   $generics_domains         = undef,
   $generics_table           = undef,
+  $auth_user                = 'root',
+  $auth_email               = undef,
+  $auth_password            = undef,
 ) inherits sendmail::params {
     package { $sendmail::params::sendmail_pkgs: ensure => latest }
 
@@ -118,6 +134,26 @@ class sendmail (
         }
     } else {
         file { $sendmail::params::generics_table_path: ensure => absent, notify => Service[$sendmail::service_name] }
+    }
+
+    if ($auth_email and $auth_password) {
+        file { $sendmail::params::authinfo_path:
+            owner   => 'root',
+            group   => 'root',
+            mode    => '0644',
+            content => template($sendmail::params::authinfo_tmpl),
+            require => Package[$sendmail::params::sendmail_pkgs],
+            notify  => Exec['make_authinfo_map'],
+        }
+        exec { 'make_authinfo_map' :
+            command     => "makemap hash $sendmail::params::authinfo_path < $sendmail::params::authinfo_path",
+            path        => [ "/bin", "/usr/sbin" ],
+            cwd         => '/etc/mail',
+            refreshonly => true,
+            notify      => Service[$sendmail::service_name],
+        }
+    } else {
+        file { $sendmail::params::authinfo_path: ensure => absent, notify => Exec['make_sendmail_config'] }
     }
 
     exec { "make_sendmail_config" :
