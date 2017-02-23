@@ -94,7 +94,7 @@ class sendmail (
         mode    => '0644',
         content => template($sendmail::params::sendmail_mc_tmpl),
         require => Package[$sendmail::params::sendmail_pkgs],
-        notify  => Exec ["make_sendmail_config"],
+        notify  => Exec["make_sendmail_config"],
     }
 
     if ($aliases) {
